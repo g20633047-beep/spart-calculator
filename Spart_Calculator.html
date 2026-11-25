@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1120">
+<title>Spart Calculator - Spart Calculator</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;min-height:100vh;padding:16px;background:#0b1120;color:#fff}
+.container{max-width:560px;margin:12px auto;background:#172338;padding:20px;border-radius:22px;box-shadow:0 15px 45px #0006}
+.header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:18px}
+.header h1{font-size:20px;color:#38bdf8;margin:0}
+.mode{background:#263750;color:#7dd3fc;border:1px solid #38516d;border-radius:9px;padding:10px 14px;cursor:pointer}
+.display{background:#0c1627;padding:17px;border-radius:14px;margin-bottom:13px;min-height:112px;overflow:hidden}
+#expression{color:#9aacc4;font-size:16px;min-height:24px;direction:ltr;text-align:left;overflow-wrap:anywhere}
+#result{font-size:31px;color:#38bdf8;text-align:left;direction:ltr;margin-top:12px;overflow-wrap:anywhere}
+.memory{display:flex;gap:7px;margin-bottom:12px}
+.memory button{flex:1;padding:10px 3px;background:#263750;color:#b8d9f5;border:0;border-radius:7px;cursor:pointer}
+.buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+button{border:0;cursor:pointer;transition:background .15s}
+.key{min-height:51px;border-radius:10px;background:#263750;color:white;font-size:17px}
+.key:hover,.memory button:hover{background:#3b506c}
+.function{background:#16466a;color:#7dd3fc}
+.operator{background:#334a67;color:#7dd3fc}
+.equal{background:#0284c7;color:white}
+.danger{background:#9f343c;color:white}
+.history{margin-top:20px;padding-top:12px;border-top:1px solid #34445a}
+.history-head{display:flex;justify-content:space-between;align-items:center}
+.history h2{font-size:17px;color:#38bdf8}
+.clear-history{color:#fca5a5;background:transparent;padding:8px}
+#historyList{max-height:180px;overflow-y:auto}
+.history-item{background:#22334a;margin:7px 0;padding:10px;border-radius:8px;direction:ltr;text-align:left;cursor:pointer;color:#d4e7f9;overflow-wrap:anywhere}
+.history-item small{display:block;color:#8da6c1;margin-top:5px}
+.footer{text-align:center;color:#8398b3;font-size:12px;margin-top:17px}
+@media(max-width:400px){body{padding:8px}.container{padding:13px}.buttons{gap:6px}.key{min-height:47px;font-size:15px}#result{font-size:26px}}
+</style>
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <h1>🧮 Spart Calculator</h1>
+    <button class="mode" onclick="toggleAngle()" id="angleMode">DEG</button>
+  </header>
+  <section class="display" aria-live="polite">
+    <div id="expression">0</div>
+    <div id="result">0</div>
+  </section>
+  <div class="memory">
+    <button onclick="memoryClear()">MC</button>
+    <button onclick="memoryRecall()">MR</button>
+    <button onclick="memoryAdd()">M+</button>
+    <button onclick="memorySubtract()">M−</button>
+  </div>
+  <section class="buttons">
+    <button class="key function" onclick="insert('sin(')">sin</button>
+    <button class="key function" onclick="insert('cos(')">cos</button>
+    <button class="key function" onclick="insert('tan(')">tan</button>
+    <button class="key function" onclick="insert('log(')">log</button>
+    <button class="key function" onclick="insert('ln(')">ln</button>
+
+    <button class="key function" onclick="insert('asin(')">sin⁻¹</button>
+    <button class="key function" onclick="insert('acos(')">cos⁻¹</button>
+    <button class="key function" onclick="insert('atan(')">tan⁻¹</button>
+    <button class="key function" onclick="insert('sqrt(')">√</button>
+    <button class="key function" onclick="insert('^2')">x²</button>
+
+    <button class="key function" onclick="insert('pi')">π</button>
+    <button class="key function" onclick="insert('e')">e</button>
+    <button class="key function" onclick="insert('^')">xʸ</button>
+    <button class="key function" onclick="insert('!')">n!</button>
+    <button class="key function" onclick="insert('%')">%</button>
+
+    <button class="key operator" onclick="insert('(')">(</button>
+    <button class="key operator" onclick="insert(')')">)</button>
+    <button class="key danger" onclick="clearAll()">AC</button>
+    <button class="key danger" onclick="backspace()">⌫</button>
+    <button class="key operator" onclick="insert('/')">÷</button>
+
+    <button class="key" onclick="insert('7')">7</button>
+    <button class="key" onclick="insert('8')">8</button>
+    <button class="key" onclick="insert('9')">9</button>
+    <button class="key operator" onclick="insert('*')">×</button>
+    <button class="key function" onclick="insert('abs(')">abs</button>
+
+    <button class="key" onclick="insert('4')">4</button>
+    <button class="key" onclick="insert('5')">5</button>
+    <button class="key" onclick="insert('6')">6</button>
+    <button class="key operator" onclick="insert('-')">−</button>
+    <button class="key function" onclick="insert('exp(')">exp</button>
+
+    <button class="key" onclick="insert('1')">1</button>
+    <button class="key" onclick="insert('2')">2</button>
+    <button class="key" onclick="insert('3')">3</button>
+    <button class="key operator" onclick="insert('+')">+</button>
+    <button class="key function" onclick="insert('Ans')">Ans</button>
+
+    <button class="key" onclick="insert('0')">0</button>
+    <button class="key" onclick="insert('.')">.</button>
+    <button class="key operator" onclick="insert('-')">+/−</button>
+    <button class="key equal" style="grid-column:span 2" onclick="calculate()">=</button>
+  </section>
+  <section class="history">
+    <div class="history-head">
+      <h2>📜 سجل العمليات</h2>
+      <button class="clear-history" onclick="clearHistory()">مسح السجل</button>
+    </div>
+    <div id="historyList"></div>
+  </section>
+  <div class="footer">Spart Calculator · Scientific Edition</div>
+</main>
+<script>
+let expression = "";
+let ans = 0;
+let memory = 0;
+let degreeMode = true;
+let history = [];
+const expBox = document.getElementById("expression");
+const resultBox = document.getElementById("result");
+
+function insert(value) {
+  expression += value;
+  expBox.textContent = expression || "0";
+  resultBox.textContent = preview();
+}
+function clearAll() {
+  expression = "";
+  expBox.textContent = "0";
+  resultBox.textContent = "0";
+}
+function backspace() {
+  expression = expression.slice(0, -1);
+  expBox.textContent = expression || "0";
+  resultBox.textContent = preview();
+}
+function toggleAngle() {
+  degreeMode = !degreeMode;
+  document.getElementById("angleMode").textContent = degreeMode ? "DEG" : "RAD";
+  resultBox.textContent = preview();
+}
+function factorial(n) {
+  if (n < 0 || !Number.isInteger(n) || n > 170) throw Error("Factorial غير صالح");
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
+}
+const functions = {
+  sin:x=>Math.sin(degreeMode?x*Math.PI/180:x),
+  cos:x=>Math.cos(degreeMode?x*Math.PI/180:x),
+  tan:x=>Math.tan(degreeMode?x*Math.PI/180:x),
+  asin:x=>angleResult(Math.asin(x)),
+  acos:x=>angleResult(Math.acos(x)),
+  atan:x=>angleResult(Math.atan(x)),
+  sqrt:x=>Math.sqrt(x),
+  log:x=>Math.log10(x),
+  ln:x=>Math.log(x),
+  abs:x=>Math.abs(x),
+  exp:x=>Math.exp(x)
+};
+function angleResult(x){return degreeMode?x*180/Math.PI:x}
+
+function tokenize(input) {
+  const tokens=[];
+  const re=/\s*([0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?|[a-zA-Z]+|[+\-*/^()%!,])/gy;
+  let pos=0;
+  while(pos<input.length){
+    re.lastIndex=pos;
+    const match=re.exec(input);
+    if(!match) throw Error("صيغة غير صحيحة");
+    tokens.push(match[1]);
+    pos=re.lastIndex;
+  }
+  const result=[];
+  for(let i=0;i<tokens.length;i++){
+    const current=tokens[i], previous=result[result.length-1];
+    if(previous!==undefined){
+      const left=/^[0-9]/.test(previous)||["pi","e","Ans",")","!","%"].includes(previous);
+      const right=/^[0-9]/.test(current)||/^[a-zA-Z]+$/.test(current)||current==="(";
+      const functionCall=Object.hasOwn(functions,previous)&&current==="(";
+      if(left&&right&&!functionCall) result.push("*");
+    }
+    result.push(current);
+  }
+  return result;
+}
+function evaluate(input) {
+  const tokens=tokenize(input);
+  let index=0;
+  const peek=()=>tokens[index];
+  const take=()=>tokens[index++];
+  function parseExpression(){
+    let value=parseTerm();
+    while(peek()==="+"||peek()==="-"){
+      const op=take(), right=parseTerm();
+      value=op==="+"?value+right:value-right;
+    }
+    return value;
+  }
+  function parseTerm(){
+    let value=parseUnary();
+    while(peek()==="*"||peek()==="/"){
+      const op=take(), right=parseUnary();
+      if(op==="/"&&right===0) throw Error("القسمة على صفر");
+      value=op==="*"?value*right:value/right;
+    }
+    return value;
+  }
+  function parseUnary(){
+    if(peek()==="+"){take();return parseUnary()}
+    if(peek()==="-"){take();return -parseUnary()}
+    return parsePower();
+  }
+  function parsePower(){
+    let value=parsePostfix();
+    if(peek()==="^"){take();value=Math.pow(value,parseUnary())}
+    return value;
+  }
+  function parsePostfix(){
+    let value=parsePrimary();
+    while(peek()==="!"||peek()==="%"){
+      const op=take();
+      if(op==="!") value=factorial(value);
+      else value/=100;
+    }
+    return value;
+  }
+  function parsePrimary(){
+    const token=take();
+    if(token===undefined) throw Error("عملية ناقصة");
+    if(token==="("){
+      const value=parseExpression();
+      if(take()!==")") throw Error("قوس غير مغلق");
+      return value;
+    }
+    if(/^[0-9]/.test(token)) return Number(token);
+    if(token==="pi") return Math.PI;
+    if(token==="e") return Math.E;
+    if(token==="Ans") return ans;
+    if(Object.hasOwn(functions,token)){
+      if(take()!=="(") throw Error("اكتب الدالة بين قوسين");
+      const value=parseExpression();
+      if(take()!==")") throw Error("قوس غير مغلق");
+      return functions[token](value);
+    }
+    throw Error("عملية غير معروفة");
+  }
+  const answer=parseExpression();
+  if(index!==tokens.length) throw Error("صيغة غير مكتملة");
+  if(!Number.isFinite(answer)) throw Error("نتيجة غير معرفة");
+  return answer;
+}
+function formatNumber(number){return Number(number.toPrecision(12)).toString()}
+function preview(){
+  if(!expression) return "0";
+  try{return formatNumber(evaluate(expression))}catch{return "…"}
+}
+function calculate(){
+  if(!expression.trim()) return;
+  try{
+    const answer=evaluate(expression);
+    ans=answer;
+    const formatted=formatNumber(answer);
+    resultBox.textContent=formatted;
+    history.unshift({expression,result:formatted});
+    history=history.slice(0,30);
+    renderHistory();
+  }catch(error){
+    resultBox.textContent="خطأ";
+  }
+}
+function memoryClear(){memory=0}
+function memoryRecall(){insert(String(memory))}
+function memoryAdd(){try{memory+=evaluate(expression)}catch{}}
+function memorySubtract(){try{memory-=evaluate(expression)}catch{}}
+function renderHistory(){
+  const list=document.getElementById("historyList");
+  list.innerHTML="";
+  history.forEach(item=>{
+    const div=document.createElement("div");
+    div.className="history-item";
+    const first=document.createElement("div");
+    first.textContent=item.expression;
+    const second=document.createElement("small");
+    second.textContent="= "+item.result;
+    div.append(first,second);
+    div.onclick=()=>{
+      expression=item.expression;
+      expBox.textContent=expression;
+      resultBox.textContent=item.result;
+    };
+    list.appendChild(div);
+  });
+}
+function clearHistory(){
+  history=[];
+  renderHistory();
+}
+document.addEventListener("keydown",event=>{
+  if(/^[0-9.]$/.test(event.key)) insert(event.key);
+  else if(["+","-","*","/","^","(",")","%","!"].includes(event.key)) insert(event.key);
+  else if(event.key==="Enter") calculate();
+  else if(event.key==="Backspace") backspace();
+  else if(event.key==="Escape") clearAll();
+});
+</script>
+</body>
+</html>
